@@ -37,14 +37,14 @@ def balance_teams(players):
 
     for player in players:
         if player['experience']:
-            if experienced_players < 3:
+            if experienced_players < len(TEAMS):
                 teams[experienced_players].append(player)
                 experienced_players += 1
             else:
                 experienced_players = 1
                 teams[0].append(player)
         else:
-            if inexperienced_players < 3:
+            if inexperienced_players < len(TEAMS):
                 teams[inexperienced_players].append(player)
                 inexperienced_players += 1
             else:
@@ -64,7 +64,7 @@ def select_team(teams, num_as_str):
     try:
         return teams[int(num_as_str)-1]
     except:
-        return select_team(teams, input(f'{num_as_str} is not a valid selection, please choose a team between 1 and 3  '))
+        return select_team(teams, input(f'{num_as_str} is not a valid selection, please choose a team between 1 and {len(teams)}  '))
 
 
 def get_experienced_players(team):
@@ -78,51 +78,43 @@ def get_experienced_players(team):
 
     return [experienced_players, inexperienced_players]
 
-if __name__ == '__main__':
-    for player in PLAYERS:
-        clean_data(player)
-
-    balanced_teams = balance_teams(players_clean_data)
-    teams = [
+def build_teams(teams):
+    team_info = []
+    for idx, team in enumerate(teams):
+        team_info.append(
         {
-        'team': TEAMS[0],
-        'players': balanced_teams[0],
-        'number_of_players': len(balanced_teams[0]),
-        'avg_height': get_avg_height(balanced_teams[0]),
-        'experienced_players': get_experienced_players(balanced_teams[0])[0],
-        'inexperienced_players': get_experienced_players(balanced_teams[0])[1]
-
-        },
-        {
-        'team': TEAMS[1],
-        'players': balanced_teams[1],
-        'number_of_players': len(balanced_teams[1]),
-        'avg_height': get_avg_height(balanced_teams[1]),
-        'experienced_players': get_experienced_players(balanced_teams[1])[0],
-        'inexperienced_players': get_experienced_players(balanced_teams[1])[1]
-        },
-        {
-        'team': TEAMS[2],
-        'players': balanced_teams[2],
-        'number_of_players': len(balanced_teams[2]),
-        'avg_height': get_avg_height(balanced_teams[2]),
-        'experienced_players': get_experienced_players(balanced_teams[2])[0],
-        'inexperienced_players': get_experienced_players(balanced_teams[2])[1]
+        'team': TEAMS[idx],
+        'players': team,
+        'number_of_players': len(team),
+        'avg_height': get_avg_height(team),
+        'experienced_players': get_experienced_players(team)[0],
+        'inexperienced_players': get_experienced_players(team)[1]
         }
-    ]
+        )
 
+    return team_info
+
+def setup_print():
     print('BASKETBALL TEAM STATS TOOL\n')
     print('----MENU---\n')
     print('Options:')
     print('1) Display Team Stats')
     print('2) Quit \n')
-    user_choice = input('Enter Option:  ')
+    return input('Enter Option(1 or 2):  ')
+
+if __name__ == '__main__':
+    for player in PLAYERS:
+        clean_data(player)
+
+    balanced_teams = balance_teams(players_clean_data)
+    teams = build_teams(balanced_teams)
+    user_choice = setup_print()
 
     while user_choice != '2':
         print()
         print('Teams:')
         for idx, team in enumerate(TEAMS):
-            print(f'{idx+1}) {team} \n')
+            print(f'{idx+1}) {team}')
         print()
         current_team = select_team(teams, input('Which team?  '))
         print()
@@ -145,9 +137,4 @@ if __name__ == '__main__':
                 guardian_string += guardian + ', '
         print(guardian_string[:len(guardian_string)-2])
         print()
-        print('BASKETBALL TEAM STATS TOOL\n')
-        print('----MENU---\n')
-        print('Options:')
-        print('1) Display Team Stats')
-        print('2) Quit \n')
-        user_choice = input('Enter Option:  ')
+        user_choice = setup_print()
